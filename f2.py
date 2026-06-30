@@ -22,7 +22,7 @@ async def run():
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(
-            headless=False,
+            headless=True,
             slow_mo=100
         )
 
