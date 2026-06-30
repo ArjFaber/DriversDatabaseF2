@@ -27,11 +27,3 @@ jobs:
 
       - name: Run scraper
         run: python f2_scraper.py
-
-      - name: Upload output CSV
-        uses: actions/upload-artifact@v4
-        with:
-          name: f2-data
-          path: |
-            f2_live_dom.csv
-            laps_data.csv
