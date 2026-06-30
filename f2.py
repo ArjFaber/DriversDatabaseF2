@@ -1,35 +1,22 @@
 import asyncio
-import csv
 import hashlib
+import re
 from datetime import datetime
-from pathlib import Path
+
+import pandas as pd
+import psycopg2
 from playwright.async_api import async_playwright
 
 URL = "https://www.fiaformula2.com/livetiming/index.html"
-CSV_FILE = Path("f2_live_dom.csv")
-
-
-def init_csv():
-    if not CSV_FILE.exists():
-        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(["timestamp", "raw_text"])
-
-
-def save(text):
-    with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([datetime.utcnow().isoformat(), text])
 
 
 def make_hash(text: str) -> str:
-    # normalize whitespace so tiny DOM differences don't trigger duplicates
     normalized = " ".join(text.split())
     return hashlib.md5(normalized.encode()).hexdigest()
 
 
 async def run():
-    init_csv()
+    snapshots = []
 
     print("Launching browser...")
 
@@ -42,28 +29,29 @@ async def run():
         page = await browser.new_page()
 
         print("Going to page...")
-
         await page.goto(URL, timeout=60000)
 
-        print("Page loaded (or timeout reached)")
-
+        print("Page loaded")
         await page.wait_for_timeout(5000)
 
         print("Starting scraping loop...")
 
-        last_hash = None  # 👈 key fix
+        last_hash = None
 
         for i in range(10):
             text = await page.evaluate("document.body.innerText")
-
             current_hash = make_hash(text)
 
             print(f"\nSNAPSHOT {i}")
 
-            # ONLY SAVE IF CHANGED
             if current_hash != last_hash:
-                print("✔ Change detected → saving")
-                save(text)
+                print("✔ Change detected → storing snapshot")
+
+                snapshots.append({
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "raw_text": text
+                })
+
                 last_hash = current_hash
             else:
                 print("⏭ No change → skipped")
@@ -71,12 +59,8 @@ async def run():
             await asyncio.sleep(2)
 
         await browser.close()
-    import pandas as pd
-    import re
 
-
-    # Load your original CSV
-    source_df = pd.read_csv("f2_live_dom.csv")
+    print(f"\nCollected {len(snapshots)} unique snapshots")
 
     pattern = re.compile(
         r'(\d+)\s+'                      # position
@@ -93,9 +77,9 @@ async def run():
 
     rows = []
 
-    for _, race_row in source_df.iterrows():
-        timestamp = race_row["timestamp"]
-        raw_text = race_row["raw_text"]
+    for snapshot in snapshots:
+        timestamp = snapshot["timestamp"]
+        raw_text = snapshot["raw_text"]
 
         for match in pattern.finditer(raw_text):
             rows.append({
@@ -113,28 +97,71 @@ async def run():
             })
 
     laps_df = pd.DataFrame(rows)
-    laps_df.columns = [
-    "timestamp",
-    "position",
-    "car_number",
-    "driver",
-    "gap",
-    "interval",
-    "lap_time",
-    "sector1",
-    "sector2",
-    "sector3",
-    "pit_stops"
-]
 
-    laps_df.to_csv(
-        "laps_data.csv",
-        mode="a",          # append mode
-        header=False,      # don't write header again
-        index=False
+    print(f"Parsed {len(laps_df)} lap records")
+
+    if laps_df.empty:
+        print("No lap data found.")
+        return
+
+    conn = psycopg2.connect(
+        host="ep-long-glitter-at9v26w9-pooler.c-9.us-east-1.aws.neon.tech",
+        database="neondb",
+        user="neondb_owner",
+        password="npg_P6OimSTt9ngC",
+        port=5432,
+        sslmode="require"
     )
+
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS f2_laps (
+        timestamp TEXT,
+        position INT,
+        car_number INT,
+        driver TEXT,
+        gap TEXT,
+        interval TEXT,
+        lap_time TEXT,
+        sector1 TEXT,
+        sector2 TEXT,
+        sector3 TEXT,
+        pit_stops TEXT
+    )
+    """)
+
+    conn.commit()
+
+    insert_query = """
+    INSERT INTO f2_laps (
+        timestamp,
+        position,
+        car_number,
+        driver,
+        gap,
+        interval,
+        lap_time,
+        sector1,
+        sector2,
+        sector3,
+        pit_stops
+    )
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """
+
+    cur.executemany(
+        insert_query,
+        laps_df.values.tolist()
+    )
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    print("Inserted rows into PostgreSQL")
     print("DONE")
 
 
 asyncio.run(run())
-
