@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: ["main"]
   workflow_dispatch:
+  schedule:
+    # Practice session 
+    - cron: '0-45 11 * * 5'
+
+    # Qualifying session
+    - cron: '55-59 15 * * 5'
+    - cron: '0-25 16 * * 5'
+  
 
 jobs:
   build:
