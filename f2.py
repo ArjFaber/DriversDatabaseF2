@@ -172,4 +172,5 @@ WHERE
 
     cur.close()
     conn.close()
+    print("Deleted incomplete rows")
 asyncio.run(run())
