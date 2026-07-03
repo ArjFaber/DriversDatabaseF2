@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
   schedule:
     # Practice session 
-    - cron: '0-45 11 * * 5'
+    - cron: '0-45/5 9 * * 5'
 
     # Qualifying session
-    - cron: '55-59 15 * * 5'
-    - cron: '0-25 16 * * 5'
+    - cron: '55-59/5 13 * * 5'
+    - cron: '0-25/5 14 * * 5'
   
 
 jobs:
