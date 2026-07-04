@@ -7,13 +7,8 @@ on:
     branches: ["main"]
   workflow_dispatch:
   schedule:
-    # Practice session 
-    - cron: '0-45/5 9 * * 5'
-
-    # Qualifying session
-    - cron: '55-59/5 13 * * 5'
-    - cron: '0-25/5 14 * * 5'
-  
+    - cron: '25-59/5 7 * * 6'
+    - cron: '0-10/5 8 * * 6'
 
 jobs:
   build:
