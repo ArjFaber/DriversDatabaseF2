@@ -127,7 +127,7 @@ async def run():
         lap_time TEXT,
         sector1 TEXT,
         sector2 TEXT,
-        sector3 TEXT,
+        sector3 TEXT
     )
     """)
 
