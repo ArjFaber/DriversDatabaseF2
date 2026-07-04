@@ -76,7 +76,8 @@ async def run():
         ts = snap["timestamp"]
 
         for r in snap["rows"]:
-            try:
+            try: df.columns = ['Event_ID', 'Number/Driver/Team', 'Laps', 'Time', 'Gap', 'Int.', 'Kph', 'Best', 'Lap']
+
                 parsed_rows.append({
                     "timestamp": ts,
                     "position": r[0],
@@ -88,7 +89,7 @@ async def run():
                     "sector1": r[6] if len(r) > 6 else None,
                     "sector2": r[7] if len(r) > 7 else None,
                     "sector3": r[8] if len(r) > 8 else None,
-                    "extra": r[9] if len(r) > 9 else None,
+                    
                 })
             except Exception:
                 continue
@@ -127,7 +128,6 @@ async def run():
         sector1 TEXT,
         sector2 TEXT,
         sector3 TEXT,
-        extra TEXT
     )
     """)
 
@@ -137,9 +137,9 @@ async def run():
     INSERT INTO f2_laps (
         timestamp, position, car_number, driver,
         gap, interval, lap_time,
-        sector1, sector2, sector3, extra
+        sector1, sector2, sector3, 
     )
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     cur.executemany(insert_query, df.values.tolist())
