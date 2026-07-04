@@ -88,7 +88,7 @@ async def run():
                     "lap_time": r[5] if len(r) > 5 else None,
                     "sector1": r[6] if len(r) > 6 else None,
                     "sector2": r[7] if len(r) > 7 else None,
-                    "sector3": r[8] if len(r) > 8 else None,
+                    "sector3": r[8] if len(r) > 8 else None
                     
                 })
             except Exception:
