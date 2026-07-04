@@ -76,8 +76,7 @@ async def run():
         ts = snap["timestamp"]
 
         for r in snap["rows"]:
-            try: df.columns = ['Event_ID', 'Number/Driver/Team', 'Laps', 'Time', 'Gap', 'Int.', 'Kph', 'Best', 'Lap']
-
+            try: 
                 parsed_rows.append({
                     "timestamp": ts,
                     "position": r[0],
