@@ -7,8 +7,8 @@ on:
     branches: ["main"]
   workflow_dispatch:
   schedule:
-    - cron: '15-59/5 10 * * 6'
-    - cron: '0-15/5 11 * * 6'
+    - cron: '15-59/5 10 * * 0'
+    - cron: '0-15/5 11 * * 0'
 
 jobs:
   build:
