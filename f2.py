@@ -138,7 +138,7 @@ async def run():
     INSERT INTO f2_laps (
         timestamp, position, car_number, driver,
         gap, interval, lap_time,
-        sector1, sector2, sector3, pitstop
+        sector1, sector2, sector3, pit_stops
     )
     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
