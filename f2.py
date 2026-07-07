@@ -88,7 +88,7 @@ async def run():
                     "sector1": r[6] if len(r) > 6 else None,
                     "sector2": r[7] if len(r) > 7 else None,
                     "sector3": r[8] if len(r) > 8 else None,
-                    "pitstop": r[9] if len(r) > 9 else None
+                    "pit_stops": r[9] if len(r) > 9 else None
                     
                 })
             except Exception:
@@ -128,7 +128,7 @@ async def run():
         sector1 TEXT,
         sector2 TEXT,
         sector3 TEXT,
-        pitstop TEXT
+        pit_stops TEXT
     )
     """)
 
