@@ -87,7 +87,8 @@ async def run():
                     "lap_time": r[5] if len(r) > 5 else None,
                     "sector1": r[6] if len(r) > 6 else None,
                     "sector2": r[7] if len(r) > 7 else None,
-                    "sector3": r[8] if len(r) > 8 else None
+                    "sector3": r[8] if len(r) > 8 else None,
+                    "pitstop": r[9] if len(r) > 9 else None
                     
                 })
             except Exception:
@@ -126,7 +127,8 @@ async def run():
         lap_time TEXT,
         sector1 TEXT,
         sector2 TEXT,
-        sector3 TEXT
+        sector3 TEXT,
+        pitstop TEXT
     )
     """)
 
@@ -136,9 +138,9 @@ async def run():
     INSERT INTO f2_laps (
         timestamp, position, car_number, driver,
         gap, interval, lap_time,
-        sector1, sector2, sector3 
+        sector1, sector2, sector3, pitstop
     )
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     cur.executemany(insert_query, df.values.tolist())
