@@ -173,7 +173,7 @@ WHERE a.ctid < b.ctid
   AND a.sector1 IS NOT DISTINCT FROM b.sector1
   AND a.sector2 IS NOT DISTINCT FROM b.sector2
   AND a.sector3 IS NOT DISTINCT FROM b.sector3
-  AND a.extra IS NOT DISTINCT FROM b.extra;
+  AND a.pit_stops IS NOT DISTINCT FROM b.pit_stops;
 """)
     conn.commit()
 
