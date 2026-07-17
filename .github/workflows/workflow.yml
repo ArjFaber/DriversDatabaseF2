@@ -26,11 +26,11 @@ jobs:
         run: |
           python3 -m venv venv
           source venv/bin/activate
-          pip3 install --upgrade pip
-          pip3 install -r requirements.txt
-          python3 -m playwright install
+          python install --upgrade pip
+          python install -r requirements.txt
+          python -m playwright install
 
       - name: Run scraper
         run: |
           source venv/bin/activate
-          python3 f2.py
+          python f2.py
