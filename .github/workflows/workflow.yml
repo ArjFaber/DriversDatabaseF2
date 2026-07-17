@@ -26,7 +26,7 @@ jobs:
         run: |
           pip3 install --upgrade pip
           pip3 install -r requirements.txt
-          playwright install
+          python3 -m playwright install
 
       - name: Run scraper
         run: python3 f2.py
